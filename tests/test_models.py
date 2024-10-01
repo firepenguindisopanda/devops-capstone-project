@@ -5,6 +5,7 @@ Test cases for Account Model
 import logging
 import unittest
 import os
+from datetime import date
 from service import app
 from service.models import Account, DataValidationError, db
 from tests.factories import AccountFactory
@@ -175,3 +176,44 @@ class TestAccount(unittest.TestCase):
         """It should not Deserialize an account with a TypeError"""
         account = Account()
         self.assertRaises(DataValidationError, account.deserialize, [])
+
+    def test_create_an_account(self):
+        """It should Create an Account and assert that it exists"""
+        fake_account = AccountFactory()
+        account = Account(
+            name=fake_account.name,
+            email=fake_account.email,
+            address=fake_account.address,
+            phone_number=fake_account.phone_number,
+            date_joined=fake_account.date_joined,
+        )
+        self.assertIsNotNone(account)
+        self.assertEqual(account.id, None) 
+        
+        account.create()
+        self.assertIsNotNone(account.id)
+    
+    def test_account_repr(self):
+        """It should return a string representation of an Account"""
+        account = AccountFactory()
+        account.create()
+        expected_repr = f"<Account {account.name} id=[{account.id}]>"
+        self.assertEqual(repr(account), expected_repr)
+
+    def test_deserialize_with_default_date(self):
+        """It should Deserialize an account and set the default date_joined"""
+        data = {
+            "name": "Test Name",
+            "email": "test@example.com",
+            "address": "123 Test St",
+        }
+        account = Account()
+        account.deserialize(data)
+        
+        self.assertEqual(account.name, data["name"])
+        self.assertEqual(account.email, data["email"])
+        self.assertEqual(account.address, data["address"])
+        self.assertEqual(account.date_joined, date.today())
+
+
+
