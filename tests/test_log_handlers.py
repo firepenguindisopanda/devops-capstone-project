@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import logging
 from service.common.log_handlers import init_logging
 
+
 class TestLogHandlers(unittest.TestCase):
     """Test cases for the init_logging function."""
 
